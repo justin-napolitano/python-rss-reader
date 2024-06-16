@@ -1,6 +1,6 @@
 +++
 title =  "Automate Posting Hugo Blog to Social Sites...Second Attempt"
-date = "2024-06-15"
+date = "2024-06-15 22:36:34.376 -0500" 
 description = "How To automate posting to social sites"
 author = "Justin Napolitano"
 tags = ['python', "hugo","programming","fail"]
@@ -11,10 +11,10 @@ images = ["images/featured-caesar.jpg"]
 ## Thoughts on This Second Pass
 
 
-1. I will create a script that parses the sites rss feed
-   1. it will then traverse the xml tree entries
-      1. if a date is newer than the last publish date.. then the 
-         1. publish that post...
+1. I will create a script that parses the sites rss feed...
+2. it will then traverse the xml tree entries...
+3. if a date is newer than the last publish date...
+4. publish that post...
 
 I am still thinking through how to publish. I will likely write a monolithic script here, but ideally I would write an api or a batch processor to handle this in some way. I am currently thinking.  
 
@@ -55,7 +55,7 @@ except Exception as e :
 
 ```
 
-#### Convert the returned date to epoch 
+### Convert the returned date to epoch
 
 the given format is 
 ```Wed, 12 Jun 2024 00:00:00 +0000```
