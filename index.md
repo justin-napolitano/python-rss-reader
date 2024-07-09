@@ -5,7 +5,7 @@ description = "How To automate posting to social sites"
 author = "Justin Napolitano"
 tags = ['python', "hugo","programming","fail"]
 images = ["images/feature-python.png"]
-categories = ["Personal"]
+categories = ["projects"]
 +++
 
 
