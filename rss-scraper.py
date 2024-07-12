@@ -15,9 +15,9 @@ def get_last_run():
     except Exception as e:
         raise e
 
-def get_news_feed():
+def get_news_feed(feed_url):
     try:
-        NewsFeed = feedparser.parse("https://jnapolitano.com/index.xml")
+        NewsFeed = feedparser.parse(feed_url)
         return NewsFeed
     except Exception as e:
         raise e
@@ -58,18 +58,41 @@ def write_current_dt_to_file(file_name = "last_run.txt"):
 
 
 try:
-    last_run_epoch = get_last_run()
-    NewsFeed = get_news_feed()
-   
-    for entry in NewsFeed.entries:
-        given = entry.published
-        # print(given)
-        # print(convert_to_epoch(given))
-        publish_date_epoch = convert_to_epoch(given)
-        if publish_date_epoch > last_run_epoch:
-            print(True)
-            # in the next pass this will run the social update workflow
+    # keys_i_want = ['author_name','author_email', 'author_id','postid','id','published','title']
     
+    out_struct = {
+        "author_name": None,
+        "author_email": None,
+        "author_id": None,
+        "postid": None,
+        "published": None,
+        "title": None
+    }
+
+    last_run_epoch = get_last_run()
+    NewsFeed = get_news_feed("https://jnapolitano.com/en/posts/index.xml")
+   
+    for post in NewsFeed.entries:
+
+        try: 
+            out_struct['author_name'] = post['author_name']
+            out_struct['author_email'] = post['author_email']
+            out_struct['author_id'] = post['author_id']
+            out_struct['postid'] = post['postid']
+            out_struct['published'] = convert_to_epoch(post['published'])
+            out_struct['title'] = post['title']
+        except Exception as e:
+            raise e
+        
+        print(out_struct)
+
+        ## Write a script to select the given post id
+        ## if exists do nothing? Or update. IDK 
+        ## if not exists then insert record
+        # or drop into an if null.. 
+        #somethin glike
+        #SELECT IFNULL( (SELECT field1 FROM table WHERE id = 123 LIMIT 1) ,'not found');
+        # I'll have to experiment to figure it ou
     # run the write epoch to file function
     result = write_current_dt_to_file()
 
