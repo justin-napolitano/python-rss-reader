@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8080
 
 # Command to run the application with the specified arguments
-CMD ["python", "rss-scraper.py", "--url", "https://rss-updater-pkpovjepjq-wl.a.run.app", "--local"]
+CMD ["python", "rss-scraper.py", "--url", "https://rss-updater-pkpovjepjq-wl.a.run.app"]
