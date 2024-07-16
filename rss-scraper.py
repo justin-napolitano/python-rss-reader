@@ -3,13 +3,17 @@ from datetime import datetime
 import requests
 import json
 import argparse
+import os
+from gcputils.GoogleCloudLogging import GoogleCloudLogging
+import logging
+from dotenv import load_dotenv
 
 def get_news_feed(feed_url="https://jnapolitano.com/index.xml"):
     try:
         NewsFeed = feedparser.parse(feed_url)
         return NewsFeed
     except Exception as e:
-        print(f"An error occurred while fetching the news feed: {e}")
+        logging.error(f"An error occurred while fetching the news feed: {e}")
         return None
 
 
@@ -19,7 +23,7 @@ def format_datetime(date_str, date_format="%a, %d %b %Y %H:%M:%S %z"):
         formatted_date = dt.strftime("%Y-%m-%dT%H:%M:%S")
         return formatted_date
     except Exception as e:
-        print(f"An error occurred while formatting date: {e}")
+        logging.error(f"An error occurred while formatting date: {e}")
         return None
 
 
@@ -37,13 +41,13 @@ def update_database_feed(entry, base_url):
         }
         response = requests.post(url, headers=headers, data=json.dumps(data))
         if response.status_code == 201:
-            print(f"Successfully added entry: {data['title']}")
+            logging.info(f"Successfully added entry: {data['title']}")
         elif response.status_code == 200:
-            print(f"Entry updated or no update needed for: {data['title']}")
+            logging.info(f"Entry updated or no update needed for: {data['title']}")
         else:
-            print(f"Failed to update database for entry: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
+            logging.error(f"Failed to update database for entry: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
     except Exception as e:
-        print(f"An error occurred while updating the database: {e}")
+        logging.error(f"An error occurred while updating the database: {e}")
 
 
 def update_database_build(entry, base_url):
@@ -65,13 +69,13 @@ def update_database_build(entry, base_url):
         }
         response = requests.post(url, headers=headers, data=json.dumps(data))
         if response.status_code == 201:
-            print(f"Successfully added build: {data['title']}")
+            logging.info(f"Successfully added build: {data['title']}")
         elif response.status_code == 200:
-            print(f"Build updated or no update needed for: {data['title']}")
+            logging.info(f"Build updated or no update needed for: {data['title']}")
         else:
-            print(f"Failed to update database for build: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
+            logging.error(f"Failed to update database for build: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
     except Exception as e:
-        print(f"An error occurred while updating the database: {e}")
+        logging.error(f"An error occurred while updating the database: {e}")
 
 
 def process_feed(base_url):
@@ -79,21 +83,21 @@ def process_feed(base_url):
         NewsFeed = get_news_feed()
         
         if not NewsFeed:
-            print("Failed to retrieve news feed.")
+            logging.error("Failed to retrieve news feed.")
             return
 
         for entry in NewsFeed.entries:
             # Unpacking dictionary keys to variables
             title = entry.get('title')
-            # title_detail = entry.get('title_detail')
-            # links = entry.get('links')
-            # link = entry.get('link')
+            title_detail = entry.get('title_detail')
+            links = entry.get('links')
+            link = entry.get('link')
             published = entry.get('published')
-            # published_parsed = entry.get('published_parsed')
-            # entry_id = entry.get('id')
-            # guidislink = entry.get('guidislink')
-            # summary = entry.get('summary')
-            # summary_detail = entry.get('summary_detail')
+            published_parsed = entry.get('published_parsed')
+            entry_id = entry.get('id')
+            guidislink = entry.get('guidislink')
+            summary = entry.get('summary')
+            summary_detail = entry.get('summary_detail')
             # description = entry.get('description')
             # generator = entry.get('generator')
             # language = entry.get('language')
@@ -103,35 +107,41 @@ def process_feed(base_url):
             # atom_link_rel = entry.get('atom_link_rel')
             # atom_link_type = entry.get('atom_link_type')
 
-            # # Logging for debugging
-            # print(f"Title: {title}")
-            # print(f"Title Detail: {title_detail}")
-            # print(f"Links: {links}")
-            # print(f"Link: {link}")
-            # print(f"Published: {published}")
-            # print(f"Published Parsed: {published_parsed}")
-            # print(f"ID: {entry_id}")
-            # print(f"GUID is Link: {guidislink}")
-            # print(f"Summary: {summary}")
-            # print(f"Summary Detail: {summary_detail}")
+            # Logging for debugging
+            logging.info(f"Title: {title}")
+            logging.info(f"Title Detail: {title_detail}")
+            logging.info(f"Links: {links}")
+            logging.info(f"Link: {link}")
+            logging.info(f"Published: {published}")
+            logging.info(f"Published Parsed: {published_parsed}")
+            logging.info(f"ID: {entry_id}")
+            logging.info(f"GUID is Link: {guidislink}")
+            logging.info(f"Summary: {summary}")
+            logging.info(f"Summary Detail: {summary_detail}")
 
             if published:
-                print("New entry found:", title)
+                logging.info("New entry found:", title)
                 update_database_feed(entry, base_url)
 
-            # if last_build_date:
-            #     print("New build found:", title)
-            #     update_database_build(entry, base_url)
-
     except Exception as e:
-        print(f"An error occurred during the process: {e}")
+        logging.error(f"An error occurred during the process: {e}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process RSS feed updates.')
     parser.add_argument('--url', type=str, default="https://rss-updater-pkpovjepjq-wl.a.run.app",
                         help='Base URL for the API endpoint')
+    parser.add_argument('--local', action='store_true', help='Use local credentials for Google Cloud Logging')
     args = parser.parse_args()
+
+    # Load environment variables from .env file
+    load_dotenv()
+    # Setup Google Cloud Logging
+    project_id = os.environ.get("PROJECT_NAME")
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") if args.local else None
+    print(project_id)
+    gcl = GoogleCloudLogging(project_id, credentials_path)
+    gcl.setup_logging()
 
     # Run the feed processing with the provided URL or default
     process_feed(args.url)
