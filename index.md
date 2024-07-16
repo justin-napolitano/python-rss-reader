@@ -17,7 +17,7 @@ categories = ["projects"]
 3. if a date is newer than the last publish date...
 4. publish that post...
 
-I am still thinking through how to publish. I will likely write a monolithic script here, but ideally I would write an api or a batch processor to handle this in some way. I am currently thinking.  
+I am still thinking through how to publish. I will likely write a monolithic script here, but ideally I would write an api or a batch processor to handle this in some way. I am thinking.  
 
 
 ## Create a Script that Parses my Sites RSS Feed
