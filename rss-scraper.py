@@ -8,6 +8,9 @@ from gcputils.GoogleCloudLogging import GoogleCloudLogging
 import logging
 from dotenv import load_dotenv
 
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def get_news_feed(feed_url="https://jnapolitano.com/index.xml"):
     try:
         NewsFeed = feedparser.parse(feed_url)
@@ -29,24 +32,32 @@ def format_datetime(date_str, date_format="%a, %d %b %Y %H:%M:%S %z"):
 
 def update_database_feed(entry, base_url):
     try:
+        print("updating database feed")
         url = f"{base_url}/update/feed"
         headers = {'Content-Type': 'application/json'}
         formatted_pub_date = format_datetime(entry.get('published'))
+        # print("entry"  f"{entry}")
+        # Example usage
+
         data = {
             "title": entry.get('title'),
-            "link": entry.get('link'),
+            "link": clean_url(entry.get('link')),
             "pubDate": formatted_pub_date,
-            "guid": entry.get('id'),
+            "guid": clean_url(entry.get('id')),
             "description": entry.get('summary')
         }
+        # print("data:" f"{data}")
         response = requests.post(url, headers=headers, data=json.dumps(data))
         if response.status_code == 201:
             logging.info(f"Successfully added entry: {data['title']}")
+            logging.info(response.json)
         elif response.status_code == 200:
             logging.info(f"Entry updated or no update needed for: {data['title']}")
+            logging.info(response.json)
         else:
             logging.error(f"Failed to update database for entry: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
     except Exception as e:
+        # print(f"error {e}")
         logging.error(f"An error occurred while updating the database: {e}")
 
 
@@ -76,6 +87,23 @@ def update_database_build(entry, base_url):
             logging.error(f"Failed to update database for build: {data['title']}, Status Code: {response.status_code}, Message: {response.text}")
     except Exception as e:
         logging.error(f"An error occurred while updating the database: {e}")
+
+
+def clean_url(url):
+    # Find the position of the first occurrence of "jnapolitano.com"
+    first_occurrence = url.find("jnapolitano.com")
+    # Find the position of the second occurrence of "jnapolitano.com"
+    second_occurrence = url.find("jnapolitano.com", first_occurrence + len("jnapolitano.com"))
+    
+    # If the second occurrence is found, remove it and the slash following it
+    if second_occurrence != -1:
+        clean_url = url[:second_occurrence] + url[second_occurrence + len("jnapolitano.com") + 1:]
+    else:
+        clean_url = url
+
+    return clean_url
+
+
 
 
 def process_feed(base_url):
@@ -120,6 +148,7 @@ def process_feed(base_url):
             logging.info(f"Summary Detail: {summary_detail}")
 
             if published:
+                # print("calling update_database_feed")
                 logging.info("New entry found:", title)
                 update_database_feed(entry, base_url)
 
@@ -139,9 +168,9 @@ if __name__ == "__main__":
     # Setup Google Cloud Logging
     project_id = os.environ.get("PROJECT_NAME")
     credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") if args.local else None
-    print(project_id)
-    gcl = GoogleCloudLogging(project_id, credentials_path)
-    gcl.setup_logging()
+    # print(project_id)
+    # gcl = GoogleCloudLogging(project_id, credentials_path)
+    # gcl.setup_logging()
 
     # Run the feed processing with the provided URL or default
     process_feed(args.url)
