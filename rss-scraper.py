@@ -89,20 +89,21 @@ def update_database_build(entry, base_url):
         logging.error(f"An error occurred while updating the database: {e}")
 
 
-def clean_url(url):
-    # Find the position of the first occurrence of "jnapolitano.com"
+def clean_url(url,lang_code = "en"):
+     # Find the position of the first occurrence of "jnapolitano.com"
     first_occurrence = url.find("jnapolitano.com")
     # Find the position of the second occurrence of "jnapolitano.com"
     second_occurrence = url.find("jnapolitano.com", first_occurrence + len("jnapolitano.com"))
     
     # If the second occurrence is found, remove it and the slash following it
     if second_occurrence != -1:
-        clean_url = url[:second_occurrence] + url[second_occurrence + len("jnapolitano.com") + 1:]
-    else:
-        clean_url = url
+        url = url[:second_occurrence] + url[second_occurrence + len("jnapolitano.com") + 1:]
+
+    # Add the language code (e.g., /en) after the domain
+    first_occurrence_end = first_occurrence + len("jnapolitano.com")
+    clean_url = url[:first_occurrence_end] + f"/{lang_code}" + url[first_occurrence_end:]
 
     return clean_url
-
 
 
 
@@ -149,7 +150,7 @@ def process_feed(base_url):
 
             if published:
                 # print("calling update_database_feed")
-                logging.info("New entry found:", title)
+                logging.info(f"New entry found: {title}" )
                 update_database_feed(entry, base_url)
 
     except Exception as e:
