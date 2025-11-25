@@ -1,20 +1,29 @@
 ---
 slug: github-python-rss-reader
 id: github-python-rss-reader
-title: python-rss-reader
+title: Python RSS Reader for Automating Blog Updates
 repo: justin-napolitano/python-rss-reader
 githubUrl: https://github.com/justin-napolitano/python-rss-reader
 generatedAt: '2025-11-24T21:36:04.484Z'
 source: github-auto
 summary: >-
-  A Python-based tool designed to parse and process RSS feeds, primarily aimed
-  at automating the posting of Hugo blog updates to social media or other
-  platforms. This project includes utilities for interacting with Google Cloud
-  services and supports deployment via Docker and Google Cloud Build.
-tags: []
-seoPrimaryKeyword: ''
-seoSecondaryKeywords: []
-seoOptimized: false
+  A Python tool to parse RSS feeds and automate Hugo blog updates to social
+  media, with support for Docker and Google Cloud services.
+tags:
+  - python
+  - rss
+  - docker
+  - hugo
+  - bigquery
+  - feedparser
+seoPrimaryKeyword: python rss reader
+seoSecondaryKeywords:
+  - automate blog updates
+  - rss feed parser
+  - google cloud integration
+  - docker deployment
+  - hugo blog automation
+seoOptimized: true
 topicFamily: null
 topicFamilyConfidence: null
 kind: project
