@@ -1,3 +1,29 @@
+---
+kind: project
+slug: github-python-rss-reader
+id: github-python-rss-reader
+repo: justin-napolitano/python-rss-reader
+githubUrl: https://github.com/justin-napolitano/python-rss-reader
+title: Python Script to Parse RSS Feeds and Automate Posting
+summary: >-
+  Learn how to create a Python script that parses RSS feeds and automates the
+  posting process based on date comparisons.
+tags:
+  - python
+  - rss
+  - feedparser
+  - hugo
+  - programming
+seoPrimaryKeyword: python rss feed parser
+seoSecondaryKeywords:
+  - automate blog posting
+  - rss feed automation
+  - python scripting
+  - date comparison in python
+  - hugo blog automation
+seoOptimized: true
+---
+
 +++
 title =  "Automate Posting Hugo Blog to Social Sites...Second Attempt"
 date = "2024-06-15 22:36:34.376 -0500" 
